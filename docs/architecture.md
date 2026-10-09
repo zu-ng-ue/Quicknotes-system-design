@@ -20,32 +20,6 @@
 - **Writes per second:** 100,000 users * 2 writes / 86,400 seconds ≈ **3 writes/sec**
 - **Storage per year:** 100,000 notes/day * 1 KB = 100 MB/day. 100 MB * 365 = **36.5 GB/year** (Metadata only. Photos/files would be much larger).
 
-## Architecture Diagram (Text)
-
-```text
-[Client (Browser/Mobile)]
-       |
-       v
-    [ DNS ]
-       |
-       v
-    [ CDN ] <--- (Caches static assets like HTML/CSS/JS)
-       |
-       v
-[Load Balancer]
-   /       \
-  v         v
-[App Server 1] [App Server 2] <---> [Cache (Redis)]
-  \         /
-   v       v
-[Primary Database] ---> [Read Replica]
-       |
-       v
-[ Object Storage ] <--- [ Worker (Background Jobs) ]
-                          ^
-                          |
-                     [ Queue ]
-
 ## Component Explanations
 *   **Client:** The user interface running in a browser or mobile app that sends requests to the backend.
 *   **DNS:** Resolves the domain name (e.g., api.quicknotes.com) to the IP address of the load balancer.
@@ -84,3 +58,29 @@
     *   *Load Balancer:* Avoided by deploying multiple load balancers in an active-passive or active-active configuration.
     *   *App Servers:* Avoided by running multiple instances behind the load balancer.
     *   *Database:* Avoided by using a Primary-Replica setup. If the Primary fails, a Replica is promoted to Primary.
+
+## Architecture Diagram (Text)
+
+```text
+[Client (Browser/Mobile)]
+       |
+       v
+    [ DNS ]
+       |
+       v
+    [ CDN ] <--- (Caches static assets like HTML/CSS/JS)
+       |
+       v
+[Load Balancer]
+   /       \
+  v         v
+[App Server 1] [App Server 2] <---> [Cache (Redis)]
+  \         /
+   v       v
+[Primary Database] ---> [Read Replica]
+       |
+       v
+[ Object Storage ] <--- [Worker (Background Jobs)]
+                          ^
+                          |
+                     [ Queue ]
